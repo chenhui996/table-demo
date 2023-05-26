@@ -1,0 +1,24 @@
+body {
+    background-color: #33504c;
+}
+
+.table-container {
+    padding: 0;
+    margin: 0;
+
+    table {
+        border-spacing: 0px;
+        font-size: 13px;
+    }
+
+    .table-header {
+        background-color: rgb(34, 48, 46);
+        color: #3b9078;
+        font-weight: normal;
+    }
+
+    .table-body {
+        background-color: #172422;
+        color: rgb(249, 193, 82);
+    }
+}
