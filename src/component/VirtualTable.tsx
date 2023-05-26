@@ -58,24 +58,30 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
 }
 
 const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows }) => {
-    const [scrollTop, setScrollTop] = useState(0);
     const [startIndex, setStartIndex] = useState(0);
     const [visibleData, setVisibleData] = useState<any[]>([]);
     const [containerWidth, setContainerWidth] = useState(0);
     const tableRef = useRef<HTMLDivElement>(null);
     const [adjustedColumns, setAdjustedColumns] = useState<Column[]>(columns);
 
-    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-        const { scrollTop } = event.currentTarget;
-        setScrollTop(scrollTop);
+    const handleScroll = (event: React.UIEvent<HTMLDivElement> | 0) => {
+        const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget || 0;
+        const newStartIndex = Math.floor(scrollTop / rowHeight) || 0;
+
+        if (tableRef.current && startIndex + visibleRows <= rows.length) {
+            setStartIndex(newStartIndex);
+            setVisibleData(rows.slice(newStartIndex, newStartIndex + visibleRows));
+        }
     };
 
-    const totalHeight = rows.length * rowHeight; // 计算总高度
+    const totalHeight = Math.ceil(600); // 使用 Math.ceil 向上取整
     const [totalWidth, setTotalWidth] = useState(0);
 
     // 设置 table columns --------------------------------------
 
     useEffect(() => {
+        handleScroll(0);
+
         const { newColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef); // columns width 相关
 
         if (containerWidth) {
@@ -85,50 +91,38 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
         }
     }, [columns])
 
-    // ---------------------------------------------------------
-
-    useEffect(() => {
-        if (tableRef.current) {
-            const newStartIndex = Math.floor(scrollTop / rowHeight);
-            setStartIndex(newStartIndex);
-        }
-    }, [scrollTop, rowHeight]);
-
-    useEffect(() => {
-        if (startIndex + visibleRows <= rows.length) {
-            setVisibleData(rows.slice(startIndex, startIndex + visibleRows));
-        }
-    }, [startIndex, visibleRows, rows])
-
     return (
         <div className="table-container" style={{ width: '100%', overflowX: 'auto' }} ref={tableRef}>
             <div style={{ width: containerWidth, overflowX: 'scroll' }}>
-                <table className="table-header">
-                    <thead>
-                        <tr>
-                            {adjustedColumns.map((column) => (
-                                <th
-                                    key={column.dataIndex}
-                                    style={{ width: column.width, minWidth: column.width, textAlign: column?.textAlign || 'left' }}
-                                >
-                                    {column.title}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                </table>
+                <div className="table-header-contaienr">
+                    <table className="table-header">
+                        <thead>
+                            <tr>
+                                {adjustedColumns.map((column, index) => (
+                                    <th
+                                        key={column.dataIndex + index}
+                                        style={{ width: column.width, minWidth: column.width, textAlign: column?.textAlign || 'left' }}
+                                    >
+                                        {column.title}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
                 <div
-                    style={{ height: rowHeight * visibleRows, overflowY: 'scroll', width: totalWidth }} // 设置总高度和滚动属性
+                    className="table-body-container"
+                    style={{ height: 300, overflow: 'clip scroll', width: totalWidth }} // 修改 overflow 属性
                     onScroll={handleScroll}
-                    ref={tableRef}
                 >
                     <div style={{ height: totalHeight, width: totalWidth, overflow: 'hidden' }}>
-                        <table className="table-body" style={{ paddingTop: startIndex * rowHeight }}>
+                        <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
-                                {visibleData.map((row) => (
-                                    <tr key={row.id} style={{ height: rowHeight }}>
-                                        {adjustedColumns.map((column) => (
-                                            <td key={column.dataIndex} style={{ width: column.width, minWidth: column.width }}>
+                                {visibleData.map((row, index) => (
+                                    <tr key={row.id + index} style={{ height: rowHeight }}>
+                                        {adjustedColumns.map((column, index) => (
+                                            <td key={column.dataIndex + index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{
                                                     width: column.width,
                                                     textAlign: column.textAlign || 'left',
@@ -144,7 +138,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
