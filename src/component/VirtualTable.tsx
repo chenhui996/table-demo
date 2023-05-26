@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface RowData {
     id: number;
@@ -24,7 +24,7 @@ interface TableProps {
 }
 
 // columns width
-const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivElement>, setColumns: React.Dispatch<React.SetStateAction<Column[]>>) => {
+const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivElement>) => {
     let totalWidth = columns.reduce((total, column) => {
         if (column.width) {
             return total + column.width;
@@ -76,7 +76,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
     // 设置 table columns --------------------------------------
 
     useEffect(() => {
-        const { newColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef, setAdjustedColumns); // columns width 相关
+        const { newColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef); // columns width 相关
 
         if (containerWidth) {
             setContainerWidth(containerWidth);
