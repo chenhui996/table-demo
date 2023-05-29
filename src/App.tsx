@@ -4,7 +4,7 @@ import VirtualTable, { Column } from './component/VirtualTable';
 interface DataItem {
   id: number;
   name: string;
-  age: string;
+  age: number;
 }
 
 const mockData: DataItem[] = Array.from({ length: 80000 }).map((_, index) => ({
@@ -18,7 +18,7 @@ const mockData: DataItem[] = Array.from({ length: 80000 }).map((_, index) => ({
   name6: `John Doe${index + 1}`,
   name7: `John Doe${index + 1}`,
   name8: `John Doe${index + 1}`,
-  age: `${index + 1}`
+  age: index + 1
 }));
 
 const columns: Column[] = [
@@ -51,7 +51,17 @@ const columns: Column[] = [
 ];
 
 const App: React.FC = () => {
-  const [data, setData] = useState<DataItem[]>(mockData)
+  const [data, setData] = useState<DataItem[]>(mockData);
+
+  const getRowClassName = (rowData: DataItem) => {
+    if (rowData.age % 2 === 1) {
+      return 'row-red';
+    } else if (rowData.age % 2 === 0) {
+      return 'row-green';
+    } else {
+      return '';
+    }
+  };
 
   // setTimeout(() => {
   //   const newData = [...data].concat([{
@@ -68,7 +78,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
-      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={30} columns={columns} />
+      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={30} columns={columns} rowClassName={getRowClassName} />
     </div>
   );
 };

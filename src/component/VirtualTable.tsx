@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 interface RowData {
     id: number;
     name: string;
-    age: string;
+    age: number;
     // 其他列数据
 }
 
@@ -22,6 +22,7 @@ interface TableProps {
     rowHeight: number;
     visibleRows: number;
     height?: number;
+    rowClassName?: (rowData: RowData) => string;
 }
 
 // columns width
@@ -58,13 +59,13 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     };
 }
 
-const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows, height = 300 }) => {
+const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows, height = 300, rowClassName }) => {
     const tableRef = useRef<HTMLDivElement>(null);
-    const [startIndex, setStartIndex] = useState(0);
+    const [startIndex, setStartIndex] = useState<number>(0);
     const [visibleData, setVisibleData] = useState<typeof rows | []>([]);
-    const [totalHeight, setTotalHeight] = useState(0);
-    const [totalWidth, setTotalWidth] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(0);
+    const [totalHeight, setTotalHeight] = useState<number>(0);
+    const [totalWidth, setTotalWidth] = useState<number>(0);
+    const [containerWidth, setContainerWidth] = useState<number>(0);
     const [adjustedColumns, setAdjustedColumns] = useState<Column[]>(columns);
 
     // ---------------------------------------------------------
@@ -134,7 +135,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                         <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
                                 {visibleData.map((row, index) => (
-                                    <tr key={index} style={{ height: rowHeight }}>
+                                    <tr key={index} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row) : ''}>
                                         {adjustedColumns.map((column, index) => (
                                             <td key={index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{
