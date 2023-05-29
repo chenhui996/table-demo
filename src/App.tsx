@@ -7,7 +7,7 @@ interface DataItem {
   age: string;
 }
 
-const mockData: DataItem[] = Array.from({ length: 60 }).map((_, index) => ({
+const mockData: DataItem[] = Array.from({ length: 80000 }).map((_, index) => ({
   id: index + 1,
   name: `John Doe${index + 1}`,
   name1: `John Doe${index + 1}`,
