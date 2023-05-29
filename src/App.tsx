@@ -19,6 +19,18 @@ const mockData: DataItem[] = Array.from({ length: 80000 }).map((_, index) => ({
   name6: `John Doe${index + 1}`,
   name7: `John Doe${index + 1}`,
   name8: `John Doe${index + 1}`,
+  name9: `John Doe${index + 1}`,
+  name10: `John Doe${index + 1}`,
+  name11: `John Doe${index + 1}`,
+  name12: `John Doe${index + 1}`,
+  name13: `John Doe${index + 1}`,
+  name14: `John Doe${index + 1}`,
+  name15: `John Doe${index + 1}`,
+  name16: `John Doe${index + 1}`,
+  name17: `John Doe${index + 1}`,
+  name18: `John Doe${index + 1}`,
+  name19: `John Doe${index + 1}`,
+  name20: `John Doe${index + 1}`,
   age: index + 1
 }));
 
@@ -35,18 +47,18 @@ const columns: Column[] = [
   { dataIndex: 'name7', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name8', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name9', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'age', title: 'Age2', textAlign: 'left', width: 200 },
-  { dataIndex: 'name15', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name16', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name17', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name18', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name19', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name20', title: 'Name', textAlign: 'left' },
+  // { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'age', title: 'Age2', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name15', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name16', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name17', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name18', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name19', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name20', title: 'Name', textAlign: 'left' },
   { dataIndex: 'age', title: 'Age3', textAlign: 'left', width: 200 },
   // 其他列设置
 ];
@@ -56,8 +68,8 @@ const App: React.FC = () => {
 
   const getRowClassName = (rowData: DataItem) => {
     return cn('table-row', {
-      'row-red': rowData.age % 2 === 1,
-      'row-green': rowData.age % 2 === 0
+      // 'row-red': rowData.age % 2 === 1,
+      // 'row-green': rowData.age % 2 === 0
     });
   };
 
@@ -76,7 +88,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
-      <VirtualTable data={data} height={240} rowHeight={24} visibleRows={30} columns={columns} rowClassName={getRowClassName} />
+      <VirtualTable data={data} height={300} columns={columns} rowClassName={getRowClassName} />
     </div>
   );
 };

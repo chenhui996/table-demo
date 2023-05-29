@@ -19,8 +19,7 @@ export interface Column {
 interface TableProps {
     columns: Column[];
     data: RowData[];
-    rowHeight: number;
-    visibleRows: number;
+    rowHeight?: number;
     height?: number;
     rowClassName?: (rowData: RowData, index?: number) => string;
 }
@@ -59,7 +58,20 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     };
 }
 
-const VirtualTable: React.FC<TableProps> = ({ columns, data, rowHeight, visibleRows, height = 300, rowClassName }) => {
+const VirtualTable: React.FC<TableProps> = (props) => {
+    const {
+        columns,
+        data,
+        rowHeight = 24,
+        height = 300,
+        rowClassName
+    } = props;
+
+    // ---------------------------------------------------------
+
+    const diffCount = 2;
+    const visibleRows = ((height - 24) + (diffCount * 2 * 24)) / 24;
+    
     const tableRef = useRef<HTMLDivElement>(null);
     const [startIndex, setStartIndex] = useState<number>(0);
     const [visibleData, setVisibleData] = useState<typeof data | []>([]);
@@ -72,7 +84,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, data, rowHeight, visibleR
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget;
-        const diff = scrollTop - rowHeight * 10;
+        const diff = scrollTop - rowHeight * diffCount;
         const index = diff > 0 ? Math.floor(diff / rowHeight) : 0;
 
         setStartIndex(index);
@@ -135,7 +147,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, data, rowHeight, visibleR
                         <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
                                 {visibleData.map((row, index) => (
-                                    <tr key={index} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row, index) : ''}>
+                                    <tr key={row.id} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row, index) : ''}>
                                         {adjustedColumns.map((column, index) => (
                                             <td key={index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{
