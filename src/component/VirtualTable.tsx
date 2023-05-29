@@ -18,11 +18,11 @@ export interface Column {
 
 interface TableProps {
     columns: Column[];
-    rows: RowData[];
+    data: RowData[];
     rowHeight: number;
     visibleRows: number;
     height?: number;
-    rowClassName?: (rowData: RowData) => string;
+    rowClassName?: (rowData: RowData, index?: number) => string;
 }
 
 // columns width
@@ -59,10 +59,10 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     };
 }
 
-const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows, height = 300, rowClassName }) => {
+const VirtualTable: React.FC<TableProps> = ({ columns, data, rowHeight, visibleRows, height = 300, rowClassName }) => {
     const tableRef = useRef<HTMLDivElement>(null);
     const [startIndex, setStartIndex] = useState<number>(0);
-    const [visibleData, setVisibleData] = useState<typeof rows | []>([]);
+    const [visibleData, setVisibleData] = useState<typeof data | []>([]);
     const [totalHeight, setTotalHeight] = useState<number>(0);
     const [totalWidth, setTotalWidth] = useState<number>(0);
     const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -76,13 +76,13 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
         const index = diff > 0 ? Math.floor(diff / rowHeight) : 0;
 
         setStartIndex(index);
-        setVisibleData(rows.slice(index, index + visibleRows));
+        setVisibleData(data.slice(index, index + visibleRows));
     };
 
     // init ---------------------------------------------------
 
     const initData = () => {
-        setVisibleData(rows.slice(0, visibleRows));
+        setVisibleData(data.slice(0, visibleRows));
     }
 
     const initWidth = () => {
@@ -101,8 +101,8 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
     }, [])
 
     useEffect(() => {
-        setTotalHeight(Math.ceil(rows.length * rowHeight))
-    }, [rows, rowHeight])
+        setTotalHeight(Math.ceil(data.length * rowHeight))
+    }, [data, rowHeight])
 
     // ---------------------------------------------------------
 
@@ -135,7 +135,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                         <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
                                 {visibleData.map((row, index) => (
-                                    <tr key={index} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row) : ''}>
+                                    <tr key={index} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row, index) : ''}>
                                         {adjustedColumns.map((column, index) => (
                                             <td key={index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{

@@ -78,7 +78,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
-      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={30} columns={columns} rowClassName={getRowClassName} />
+      <VirtualTable data={data} height={240} rowHeight={24} visibleRows={30} columns={columns} rowClassName={getRowClassName} />
     </div>
   );
 };
