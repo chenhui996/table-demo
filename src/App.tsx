@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import cn from 'classnames';
 import VirtualTable, { Column } from './component/VirtualTable';
 
 interface DataItem {
@@ -54,13 +55,10 @@ const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>(mockData);
 
   const getRowClassName = (rowData: DataItem) => {
-    if (rowData.age % 2 === 1) {
-      return 'row-red';
-    } else if (rowData.age % 2 === 0) {
-      return 'row-green';
-    } else {
-      return '';
-    }
+    return cn('table-row', {
+      'row-red': rowData.age % 2 === 1,
+      'row-green': rowData.age % 2 === 0
+    });
   };
 
   // setTimeout(() => {
