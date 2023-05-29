@@ -7,7 +7,7 @@ interface DataItem {
   age: string;
 }
 
-const mockData: DataItem[] = Array.from({ length: 200 }).map((_, index) => ({
+const mockData: DataItem[] = Array.from({ length: 60 }).map((_, index) => ({
   id: index + 1,
   name: `John Doe${index + 1}`,
   name1: `John Doe${index + 1}`,
@@ -68,7 +68,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
-      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={10} columns={columns} />
+      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={30} columns={columns} />
     </div>
   );
 };

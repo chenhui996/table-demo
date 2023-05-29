@@ -67,12 +67,11 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement> | 0) => {
         const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget || 0;
-        const newStartIndex = Math.floor(scrollTop / rowHeight) || 0;
+        const diff = scrollTop - rowHeight * 10;
+        const index = diff > 0 ? Math.floor(diff / rowHeight) : 0;
 
-        console.log(scrollTop, newStartIndex, visibleRows, rows.length);
-
-        setStartIndex(newStartIndex);
-        setVisibleData(rows.slice(newStartIndex, newStartIndex + visibleRows));
+        setStartIndex(index);
+        setVisibleData(rows.slice(index, index + visibleRows));
     };
 
     // const totalHeight = Math.ceil(600); // 使用 Math.ceil 向上取整
