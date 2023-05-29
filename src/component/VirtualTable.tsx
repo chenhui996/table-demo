@@ -59,14 +59,18 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
 }
 
 const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows, height = 300 }) => {
-    const [startIndex, setStartIndex] = useState(0);
-    const [visibleData, setVisibleData] = useState<any[]>([]);
-    const [containerWidth, setContainerWidth] = useState(0);
     const tableRef = useRef<HTMLDivElement>(null);
+    const [startIndex, setStartIndex] = useState(0);
+    const [visibleData, setVisibleData] = useState<typeof rows | []>([]);
+    const [totalHeight, setTotalHeight] = useState(0);
+    const [totalWidth, setTotalWidth] = useState(0);
+    const [containerWidth, setContainerWidth] = useState(0);
     const [adjustedColumns, setAdjustedColumns] = useState<Column[]>(columns);
 
-    const handleScroll = (event: React.UIEvent<HTMLDivElement> | 0) => {
-        const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget || 0;
+    // ---------------------------------------------------------
+
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget;
         const diff = scrollTop - rowHeight * 10;
         const index = diff > 0 ? Math.floor(diff / rowHeight) : 0;
 
@@ -74,25 +78,32 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
         setVisibleData(rows.slice(index, index + visibleRows));
     };
 
-    // const totalHeight = Math.ceil(600); // 使用 Math.ceil 向上取整
-    const [totalHeight, setTotalHeight] = useState(Math.ceil(rows.length * rowHeight)); // 使用 Math.ceil 向上取整
-    const [totalWidth, setTotalWidth] = useState(0);
+    // init ---------------------------------------------------
 
-    // 设置 table columns --------------------------------------
+    const initData = () => {
+        setVisibleData(rows.slice(0, visibleRows));
+    }
 
-    useEffect(() => {
-        handleScroll(0); // init visible data
-
+    const initWidth = () => {
         const { adjustedColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef); // columns width 相关
 
         setContainerWidth(containerWidth);
         setTotalWidth(totalWidth);
         setAdjustedColumns(adjustedColumns);
+    }
+
+    // useEffect ----------------------------------------------
+
+    useEffect(() => {
+        initData(); // init visible data
+        initWidth(); // init columns width
     }, [])
 
     useEffect(() => {
         setTotalHeight(Math.ceil(rows.length * rowHeight))
     }, [rows, rowHeight])
+
+    // ---------------------------------------------------------
 
     return (
         <div className="table-container" style={{ width: '100%', overflowX: 'auto' }} ref={tableRef}>
@@ -130,7 +141,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                                                     width: column.width,
                                                     textAlign: column.textAlign || 'left',
                                                 }}>
-                                                    {row[column.dataIndex]}
+                                                    {row[column.dataIndex as keyof RowData]}
                                                 </div>
                                             </td>
                                         ))}
