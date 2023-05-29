@@ -31,12 +31,41 @@ body {
         table {
             tbody {
                 tr {
+                    background-color: #172422;
+
                     td {
-                        background-color: #172422;
                         border-bottom: 1px solid #263735;
+                    }
+
+                    &.gradient-switch-true {
+                        animation: frc-table-row-normal-true 3s 1;
+                    }
+
+                    &.gradient-switch-false {
+                        animation: frc-table-row-normal-false 3s 1;
                     }
                 }
             }
         }
     }
 }
+
+@keyframes frc-table-row-normal-true {
+    0% {
+        background-color: rgba(116, 76, 33, 1);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes frc-table-row-normal-false {
+    0% {
+      background-color: rgba(116, 76, 33, 1);
+    }
+  
+    100% {
+      background-color: transparent;
+    }
+  }

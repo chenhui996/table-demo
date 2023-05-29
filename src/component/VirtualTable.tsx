@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-interface RowData {
-    id: number;
-    name: string;
-    age: number;
-    // 其他列数据
-}
+import cn from 'classnames';
 
 export interface Column {
     dataIndex: string;
@@ -18,10 +12,13 @@ export interface Column {
 
 interface TableProps {
     columns: Column[];
-    data: RowData[];
+    data: any[];
     rowHeight?: number;
     height?: number;
-    rowClassName?: (rowData: RowData, index?: number) => string;
+    rowClassName?: (rowData: any, index?: number) => string;
+    updateKey?: number | string | null;
+    rowKey: string;
+    animationOpen?: boolean;
 }
 
 // columns width
@@ -64,14 +61,17 @@ const VirtualTable: React.FC<TableProps> = (props) => {
         data,
         rowHeight = 24,
         height = 300,
-        rowClassName
+        rowClassName,
+        updateKey,
+        rowKey,
+        animationOpen = false
     } = props;
 
     // ---------------------------------------------------------
 
     const diffCount = 2;
     const visibleRows = ((height - 24) + (diffCount * 2 * 24)) / 24;
-    
+
     const tableRef = useRef<HTMLDivElement>(null);
     const [startIndex, setStartIndex] = useState<number>(0);
     const [visibleData, setVisibleData] = useState<typeof data | []>([]);
@@ -91,6 +91,11 @@ const VirtualTable: React.FC<TableProps> = (props) => {
         setVisibleData(data.slice(index, index + visibleRows));
     };
 
+    const updateRowClassNames = (row: any, index: number, key: string | number | null | undefined) => {
+        console.log('in');
+        return cn(rowClassName ? rowClassName(row, index) : '', {})
+    }
+
     // init ---------------------------------------------------
 
     const initData = () => {
@@ -108,13 +113,41 @@ const VirtualTable: React.FC<TableProps> = (props) => {
     // useEffect ----------------------------------------------
 
     useEffect(() => {
+        console.log('in');
+
         initData(); // init visible data
         initWidth(); // init columns width
     }, [])
 
     useEffect(() => {
         setTotalHeight(Math.ceil(data.length * rowHeight))
-    }, [data, rowHeight])
+    }, [data.length, rowHeight])
+
+    useEffect(() => {
+        if (animationOpen && updateKey) {
+            const tableKeyArr = document.querySelectorAll('.table-body-container .table-body tbody tr');
+
+            tableKeyArr.forEach((item) => {
+                if (item.getAttribute('data-key') === updateKey.toString()) {
+                    const calssList = item.classList.value.split(' ');
+
+                    if (calssList.includes('gradient-switch-true')) {
+                        item.classList.remove('gradient-switch-true');
+                        item.classList.add('gradient-switch-false');
+                    } else if (calssList.includes('gradient-switch-false')) {
+                        item.classList.remove('gradient-switch-false');
+                        item.classList.add('gradient-switch-true');
+                    } else {
+                        item.classList.add('gradient-switch-true');
+                    }
+                }
+            });
+        }
+    }, [updateKey])
+
+    useEffect(() => {
+        console.log('visibleData', visibleData);
+    }, [visibleData])
 
     // ---------------------------------------------------------
 
@@ -147,14 +180,14 @@ const VirtualTable: React.FC<TableProps> = (props) => {
                         <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
                                 {visibleData.map((row, index) => (
-                                    <tr key={row.id} style={{ height: rowHeight }} className={rowClassName ? rowClassName(row, index) : ''}>
+                                    <tr key={row[rowKey]} data-key={row[rowKey]} style={{ height: rowHeight }} className={updateRowClassNames(row, index, updateKey)}>
                                         {adjustedColumns.map((column, index) => (
                                             <td key={index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{
                                                     width: column.width,
                                                     textAlign: column.textAlign || 'left',
                                                 }}>
-                                                    {row[column.dataIndex as keyof RowData]}
+                                                    {row[column.dataIndex as keyof any]}
                                                 </div>
                                             </td>
                                         ))}

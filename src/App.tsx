@@ -42,16 +42,16 @@ const columns: Column[] = [
   { dataIndex: 'name3', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name4', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name5', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'age', title: 'Age', textAlign: 'left', width: 200 },
+  { dataIndex: 'age', title: 'Age', textAlign: 'left' },
   { dataIndex: 'name6', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name7', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name8', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name9', title: 'Name', textAlign: 'left', width: 200 },
-  // { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
-  // { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
-  // { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
-  // { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
-  // { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
+  { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
+  { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
+  { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
+  { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
+  { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'age', title: 'Age2', textAlign: 'left', width: 200 },
   // { dataIndex: 'name15', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'name16', title: 'Name', textAlign: 'left', width: 200 },
@@ -65,30 +65,27 @@ const columns: Column[] = [
 
 const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>(mockData);
+  const [updateKey, setUpdateKey] = useState<number | string | null>(null);
 
-  const getRowClassName = (rowData: DataItem) => {
-    return cn('table-row', {
-      // 'row-red': rowData.age % 2 === 1,
-      // 'row-green': rowData.age % 2 === 0
-    });
-  };
-
-  // setTimeout(() => {
-  //   const newData = [...data].concat([{
-  //     id: data.length + 1,
-  //     name: 'Jane Smith',
-  //     age: '40'
-  //   }]);
-
-  //   console.log('newData', newData);
-
-  //   setData(newData)
-  // }, 20);
+  setTimeout(() => {
+    const radomIndex = Math.floor(Math.random() * (50 - 1) + 1) + 50;
+    const newData = [...data];
+    newData[radomIndex].age = Math.floor(Math.random() * 100);
+    setUpdateKey(radomIndex + 1);
+    setData(newData);
+  }, 30);
 
   return (
     <div>
       <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
-      <VirtualTable data={data} height={300} columns={columns} rowClassName={getRowClassName} />
+      <VirtualTable
+        rowKey='id'
+        data={data}
+        columns={columns}
+        height={400}
+        updateKey={updateKey}
+        animationOpen={false}
+      />
     </div>
   );
 };
