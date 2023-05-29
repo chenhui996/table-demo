@@ -104,7 +104,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                             <tr>
                                 {adjustedColumns.map((column, index) => (
                                     <th
-                                        key={column.dataIndex + index}
+                                        key={index}
                                         style={{ width: column.width, minWidth: column.width, textAlign: column?.textAlign || 'left' }}
                                     >
                                         {column.title}
@@ -124,9 +124,9 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
                         <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
                             <tbody>
                                 {visibleData.map((row, index) => (
-                                    <tr key={row.id + index} style={{ height: rowHeight }}>
+                                    <tr key={index} style={{ height: rowHeight }}>
                                         {adjustedColumns.map((column, index) => (
-                                            <td key={column.dataIndex + index} style={{ width: column.width, minWidth: column.width }}>
+                                            <td key={index} style={{ width: column.width, minWidth: column.width }}>
                                                 <div style={{
                                                     width: column.width,
                                                     textAlign: column.textAlign || 'left',

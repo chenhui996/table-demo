@@ -11,20 +11,28 @@ body {
         font-size: 13px;
     }
 
-    .table-header {
-        background-color: rgb(34, 48, 46);
-        color: #3b9078;
-        font-weight: normal;
+    .table-header-contaienr {
+        .table-header {
+            background-color: rgb(34, 48, 46);
+            color: #3b9078;
+            font-weight: normal;
+            height: 24px;
+        }
     }
 
+
     .table-body-container {
-        background-color: #172422;
+        // background-color: #172422;
+        background-image: linear-gradient(#263735 4%, #172422 0);
+        background-size: 100% 24px;
         color: rgb(249, 193, 82);
+        padding-top: 1px;
 
         table {
             tbody {
                 tr {
                     td {
+                        background-color: #172422;
                         border-bottom: 1px solid #263735;
                     }
                 }
