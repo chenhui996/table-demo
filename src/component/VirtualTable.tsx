@@ -21,11 +21,12 @@ interface TableProps {
     rows: RowData[];
     rowHeight: number;
     visibleRows: number;
+    height?: number;
 }
 
 // columns width
 const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivElement>) => {
-    let totalWidth = columns.reduce((total, column) => {
+    let vaildWidth = columns.reduce((total, column) => {
         if (column.width) {
             return total + column.width;
         }
@@ -33,17 +34,17 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     }, 0);
 
     const containerWidth = (ref as any).current?.clientWidth;
-    const remainingWidth = containerWidth - totalWidth; // 设置默认总宽度为100%，可根据实际情况调整
+    const remainingWidth = containerWidth - vaildWidth; // 设置默认总宽度为100%，可根据实际情况调整
 
     const flexibleColumns = (columns as Column[]).filter((column) => !column.width);
     const flexibleWidth = Math.max(remainingWidth / flexibleColumns.length, 100);
 
-    const newColumns = (columns).map((column) => ({
+    const adjustedColumns = (columns).map((column) => ({
         ...column,
         width: (column.width || flexibleWidth) - 2,
     }))
 
-    totalWidth = newColumns.reduce((total, column) => {
+    const totalWidth = adjustedColumns.reduce((total, column) => {
         if (column.width) {
             return total + column.width + 2;
         }
@@ -51,13 +52,13 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     }, 0);
 
     return {
-        newColumns,
+        adjustedColumns,
         containerWidth,
         totalWidth
     };
 }
 
-const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows }) => {
+const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleRows, height = 300 }) => {
     const [startIndex, setStartIndex] = useState(0);
     const [visibleData, setVisibleData] = useState<any[]>([]);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -68,28 +69,31 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
         const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget || 0;
         const newStartIndex = Math.floor(scrollTop / rowHeight) || 0;
 
-        if (tableRef.current && startIndex + visibleRows <= rows.length) {
-            setStartIndex(newStartIndex);
-            setVisibleData(rows.slice(newStartIndex, newStartIndex + visibleRows));
-        }
+        console.log(scrollTop, newStartIndex, visibleRows, rows.length);
+
+        setStartIndex(newStartIndex);
+        setVisibleData(rows.slice(newStartIndex, newStartIndex + visibleRows));
     };
 
-    const totalHeight = Math.ceil(600); // 使用 Math.ceil 向上取整
+    // const totalHeight = Math.ceil(600); // 使用 Math.ceil 向上取整
+    const [totalHeight, setTotalHeight] = useState(Math.ceil(rows.length * rowHeight)); // 使用 Math.ceil 向上取整
     const [totalWidth, setTotalWidth] = useState(0);
 
     // 设置 table columns --------------------------------------
 
     useEffect(() => {
-        handleScroll(0);
+        handleScroll(0); // init visible data
 
-        const { newColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef); // columns width 相关
+        const { adjustedColumns, containerWidth, totalWidth } = fitTableColumnsWidth(columns, tableRef); // columns width 相关
 
-        if (containerWidth) {
-            setContainerWidth(containerWidth);
-            setTotalWidth(totalWidth);
-            setAdjustedColumns(newColumns);
-        }
-    }, [columns])
+        setContainerWidth(containerWidth);
+        setTotalWidth(totalWidth);
+        setAdjustedColumns(adjustedColumns);
+    }, [])
+
+    useEffect(() => {
+        setTotalHeight(Math.ceil(rows.length * rowHeight))
+    }, [rows, rowHeight])
 
     return (
         <div className="table-container" style={{ width: '100%', overflowX: 'auto' }} ref={tableRef}>
@@ -113,7 +117,7 @@ const VirtualTable: React.FC<TableProps> = ({ columns, rows, rowHeight, visibleR
 
                 <div
                     className="table-body-container"
-                    style={{ height: 300, overflow: 'clip scroll', width: totalWidth }} // 修改 overflow 属性
+                    style={{ height: height - 24, overflow: 'clip scroll', width: totalWidth }} // 修改 overflow 属性
                     onScroll={handleScroll}
                 >
                     <div style={{ height: totalHeight, width: totalWidth, overflow: 'hidden' }}>

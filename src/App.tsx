@@ -7,29 +7,19 @@ interface DataItem {
   age: string;
 }
 
-const rows: DataItem[] = [
-  { id: 1, name: 'John Doe1', age: '25' },
-  { id: 2, name: 'Jane Smith2', age: '30' },
-  { id: 3, name: 'Jane Smith3', age: '31' },
-  { id: 4, name: 'Jane Smith4', age: '32' },
-  { id: 5, name: 'Jane Smith5', age: '33' },
-  { id: 6, name: 'Jane Smith6', age: '34' },
-  { id: 7, name: 'Jane Smith7', age: '35' },
-  { id: 8, name: 'Jane Smith8', age: '36' },
-  { id: 9, name: 'Jane Smith9', age: '37' },
-  { id: 10, name: 'Jane Smith10', age: '38' },
-  { id: 11, name: 'Jane Smith11', age: '39' },
-  { id: 12, name: 'Jane Smith12', age: '39' },
-  { id: 13, name: 'Jane Smith13', age: '39' },
-  { id: 14, name: 'Jane Smith14', age: '39' },
-  { id: 15, name: 'Jane Smith15', age: '39' },
-  { id: 16, name: 'Jane Smith16', age: '39' },
-  { id: 17, name: 'Jane Smith17', age: '39' },
-  { id: 18, name: 'Jane Smith18', age: '39' },
-  { id: 19, name: 'Jane Smith19', age: '39' },
-  { id: 20, name: 'Jane Smith20', age: '39' }
-  // 更多数据...
-];
+const mockData: DataItem[] = Array.from({ length: 30 }).map((_, index) => ({
+  id: index + 1,
+  name: `John Doe${index + 1}`,
+  name1: `John Doe${index + 1}`,
+  name2: `John Doe${index + 1}`,
+  name3: `John Doe${index + 1}`,
+  name4: `John Doe${index + 1}`,
+  name5: `John Doe${index + 1}`,
+  name6: `John Doe${index + 1}`,
+  name7: `John Doe${index + 1}`,
+  name8: `John Doe${index + 1}`,
+  age: `${index + 1}`
+}));
 
 const columns: Column[] = [
   { dataIndex: 'id', title: 'ID', width: 100, textAlign: 'left' },
@@ -61,7 +51,7 @@ const columns: Column[] = [
 ];
 
 const App: React.FC = () => {
-  const [data, setData] = useState<any[]>(rows)
+  const [data, setData] = useState<DataItem[]>(mockData)
 
   // setTimeout(() => {
   //   const newData = [...data].concat([{
@@ -77,8 +67,8 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h1 style={{color: '#fff'}}>Virtual Scrollable Table</h1>
-      <VirtualTable rows={data} rowHeight={30} visibleRows={10} columns={columns} />
+      <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
+      <VirtualTable rows={data} height={240} rowHeight={24} visibleRows={10} columns={columns} />
     </div>
   );
 };
