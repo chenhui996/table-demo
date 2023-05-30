@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cn from 'classnames';
 import VirtualTable, { Column } from './component/VirtualTable';
 
@@ -47,11 +47,11 @@ const columns: Column[] = [
   { dataIndex: 'name7', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name8', title: 'Name', textAlign: 'left', width: 200 },
   { dataIndex: 'name9', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
-  { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name10', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name11', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name12', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name13', title: 'Name', textAlign: 'left', width: 200 },
+  // { dataIndex: 'name14', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'age', title: 'Age2', textAlign: 'left', width: 200 },
   // { dataIndex: 'name15', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'name16', title: 'Name', textAlign: 'left', width: 200 },
@@ -59,32 +59,47 @@ const columns: Column[] = [
   // { dataIndex: 'name18', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'name19', title: 'Name', textAlign: 'left', width: 200 },
   // { dataIndex: 'name20', title: 'Name', textAlign: 'left' },
-  { dataIndex: 'age', title: 'Age3', textAlign: 'left', width: 200 },
+  // { dataIndex: 'age', title: 'Age3', textAlign: 'left', width: 200 },
   // 其他列设置
 ];
 
 const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>(mockData);
-  const [updateKey, setUpdateKey] = useState<number | string | null>(null);
+  const [updateKey, setUpdateKey] = useState<number | undefined>(undefined);
+  const [rowSize, setRowSize] = useState<number[]>([0, 0]);
 
-  setTimeout(() => {
-    const radomIndex = Math.floor(Math.random() * (50 - 1) + 1) + 50;
-    const newData = [...data];
-    newData[radomIndex].age = Math.floor(Math.random() * 100);
-    setUpdateKey(radomIndex + 1);
-    setData(newData);
-  }, 30);
+  const fetchRowSize = (size: number[]) => {
+    setRowSize(size);
+  }
+
+  useEffect(() => {
+    const pushData = setInterval(() => {
+      const radomIndex = Math.floor(Math.random() * (10 - 0 + 1) + 0);
+      if (radomIndex >= rowSize[0] && radomIndex <= rowSize[1]) {
+        const newData = [...data];
+        newData[radomIndex].age = Math.floor(Math.random() * 100);
+
+        setUpdateKey(radomIndex + 1);
+        setData(newData);
+      }
+    }, 50);
+
+    return () => {
+      clearInterval(pushData);
+    }
+  }, [rowSize, data])
 
   return (
     <div>
-      <h1 style={{ color: '#fff' }}>Virtual Scrollable Table</h1>
+      <h1>123</h1>
       <VirtualTable
         rowKey='id'
         data={data}
         columns={columns}
-        height={400}
+        height={300}
         updateKey={updateKey}
-        animationOpen={false}
+        animationOpen={true}
+        rowSizeChange={fetchRowSize}
       />
     </div>
   );

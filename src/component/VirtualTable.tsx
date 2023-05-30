@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
 import cn from 'classnames';
 
 export interface Column {
@@ -16,9 +16,10 @@ interface TableProps {
     rowHeight?: number;
     height?: number;
     rowClassName?: (rowData: any, index?: number) => string;
-    updateKey?: number | string | null;
+    updateKey?: number;
     rowKey: string;
     animationOpen?: boolean;
+    rowSizeChange?: (size: number[]) => void;
 }
 
 // columns width
@@ -55,6 +56,77 @@ const fitTableColumnsWidth = (columns: Column[], ref: React.RefObject<HTMLDivEle
     };
 }
 
+const Table: React.FC<any> = memo((props) => {
+    const {
+        tableRef,
+        containerWidth,
+        adjustedColumns,
+        height,
+        totalHeight,
+        totalWidth,
+        handleScroll,
+        rowSize,
+        rowHeight,
+        visibleData,
+        rowKey,
+        updateRowClassNames
+    } = props;
+
+    return <>
+        <div className="table-container" style={{ width: '100%', overflowX: 'auto' }} ref={tableRef}>
+            <div style={{ width: containerWidth, overflowX: 'scroll' }}>
+                <div className="table-header-contaienr">
+                    <table className="table-header">
+                        <thead>
+                            <tr>
+                                {adjustedColumns.map((column: any, index: number) => {
+                                    console.log('in');
+
+                                    return (
+                                        <th
+                                            key={index}
+                                            style={{ width: column.width, minWidth: column.width, textAlign: column?.textAlign || 'left' }}
+                                        >
+                                            {column.title}
+                                        </th>
+                                    )
+                                })}
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <div
+                    className="table-body-container"
+                    style={{ height: height - 24, overflow: 'clip scroll', width: totalWidth }} // 修改 overflow 属性
+                    onScroll={handleScroll}
+                >
+                    <div style={{ height: totalHeight, width: totalWidth, overflow: 'hidden' }}>
+                        <table className="table-body" style={{ paddingTop: rowSize[0] * rowHeight || 0 }}>
+                            <tbody>
+                                {visibleData.map((row: any, index: number) => (
+                                    <tr key={row[rowKey]} data-key={row[rowKey]} style={{ height: rowHeight }} className={updateRowClassNames(row, index)}>
+                                        {adjustedColumns.map((column: any, index: number) => (
+                                            <td key={index} style={{ width: column.width, minWidth: column.width }}>
+                                                <div style={{
+                                                    width: column.width,
+                                                    textAlign: column.textAlign || 'left',
+                                                }}>
+                                                    {row[column.dataIndex as keyof any]}
+                                                </div>
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </>
+});
+
 const VirtualTable: React.FC<TableProps> = (props) => {
     const {
         columns,
@@ -64,16 +136,17 @@ const VirtualTable: React.FC<TableProps> = (props) => {
         rowClassName,
         updateKey,
         rowKey,
-        animationOpen = false
+        animationOpen = false,
+        rowSizeChange
     } = props;
 
     // ---------------------------------------------------------
 
     const diffCount = 2;
-    const visibleRows = ((height - 24) + (diffCount * 2 * 24)) / 24;
+    const visibleRows = Math.floor(((height - 24) + (diffCount * 2 * 24)) / 24);
 
     const tableRef = useRef<HTMLDivElement>(null);
-    const [startIndex, setStartIndex] = useState<number>(0);
+    const [rowSize, setRowSize] = useState<number[]>([0, visibleRows]);
     const [visibleData, setVisibleData] = useState<typeof data | []>([]);
     const [totalHeight, setTotalHeight] = useState<number>(0);
     const [totalWidth, setTotalWidth] = useState<number>(0);
@@ -82,19 +155,19 @@ const VirtualTable: React.FC<TableProps> = (props) => {
 
     // ---------------------------------------------------------
 
-    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop } = (event as React.UIEvent<HTMLDivElement>)?.currentTarget;
         const diff = scrollTop - rowHeight * diffCount;
         const index = diff > 0 ? Math.floor(diff / rowHeight) : 0;
 
-        setStartIndex(index);
+        setRowSize([index, index + visibleRows]);
         setVisibleData(data.slice(index, index + visibleRows));
-    };
+    }, [rowHeight, visibleRows, data]);
 
-    const updateRowClassNames = (row: any, index: number, key: string | number | null | undefined) => {
-        console.log('in');
+    const updateRowClassNames = useCallback((row: any, index: number) => {
+        // console.log('in');
         return cn(rowClassName ? rowClassName(row, index) : '', {})
-    }
+    }, [rowClassName]);
 
     // init ---------------------------------------------------
 
@@ -146,59 +219,31 @@ const VirtualTable: React.FC<TableProps> = (props) => {
     }, [updateKey])
 
     useEffect(() => {
-        console.log('visibleData', visibleData);
-    }, [visibleData])
+        if (rowSizeChange) {
+            rowSizeChange(rowSize);
+        }
+    }, [rowSize])
+
 
     // ---------------------------------------------------------
 
     return (
-        <div className="table-container" style={{ width: '100%', overflowX: 'auto' }} ref={tableRef}>
-            <div style={{ width: containerWidth, overflowX: 'scroll' }}>
-                <div className="table-header-contaienr">
-                    <table className="table-header">
-                        <thead>
-                            <tr>
-                                {adjustedColumns.map((column, index) => (
-                                    <th
-                                        key={index}
-                                        style={{ width: column.width, minWidth: column.width, textAlign: column?.textAlign || 'left' }}
-                                    >
-                                        {column.title}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-
-                <div
-                    className="table-body-container"
-                    style={{ height: height - 24, overflow: 'clip scroll', width: totalWidth }} // 修改 overflow 属性
-                    onScroll={handleScroll}
-                >
-                    <div style={{ height: totalHeight, width: totalWidth, overflow: 'hidden' }}>
-                        <table className="table-body" style={{ paddingTop: startIndex * rowHeight || 0 }}>
-                            <tbody>
-                                {visibleData.map((row, index) => (
-                                    <tr key={row[rowKey]} data-key={row[rowKey]} style={{ height: rowHeight }} className={updateRowClassNames(row, index, updateKey)}>
-                                        {adjustedColumns.map((column, index) => (
-                                            <td key={index} style={{ width: column.width, minWidth: column.width }}>
-                                                <div style={{
-                                                    width: column.width,
-                                                    textAlign: column.textAlign || 'left',
-                                                }}>
-                                                    {row[column.dataIndex as keyof any]}
-                                                </div>
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Table
+            {...{
+                tableRef,
+                containerWidth,
+                adjustedColumns,
+                height,
+                totalHeight,
+                totalWidth,
+                handleScroll,
+                rowSize,
+                rowHeight,
+                visibleData,
+                rowKey,
+                updateRowClassNames
+            }}
+        />
     );
 };
 
